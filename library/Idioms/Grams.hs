@@ -4,8 +4,9 @@ module Idioms.Grams where
 
 import Control.DeepSeq
 
-import Data.Map (Map)
-import qualified Data.Map as Map
+-- slightly faster, surprisingly, as of 2017-09-26 1:49am
+import Data.Map.Lazy (Map)
+import qualified Data.Map.Lazy as Map
 
 data Model a = 
   Model { twoGrams :: Map (a,a) Int,
