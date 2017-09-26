@@ -13,7 +13,7 @@ benchmarks:
     - -with-rtsopts=-N
     main: Main.hs
     source-dirs: benchmark
-category: Other
+category: Machine Learning
 description: idioms is for finding idioms in straight-line code.
 executables:
   idioms:
@@ -44,7 +44,7 @@ library:
 license: MIT
 maintainer: Michael Greenberg
 name: idioms
-synopsis: A new Haskeleton package.
+synopsis: Finding idioms in straight-line code.
 tests:
   idioms-test-suite:
     dependencies:
