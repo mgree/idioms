@@ -1,0 +1,65 @@
+# This YAML file describes your package. Stack will automatically generate a
+# Cabal file when you run `stack build`. See the hpack website for help with
+# this file: <https://github.com/sol/hpack>.
+benchmarks:
+  idioms-benchmarks:
+    dependencies:
+    - base
+    - idioms
+    - criterion
+    ghc-options:
+    - -rtsopts
+    - -threaded
+    - -with-rtsopts=-N
+    main: Main.hs
+    source-dirs: benchmark
+category: Other
+description: idioms is for finding idioms in straight-line code.
+executables:
+  idioms:
+    dependencies:
+    - base
+    - idioms
+    - containers
+    ghc-options:
+    - -rtsopts
+    - -threaded
+    - -with-rtsopts=-N
+    main: Main.hs
+    source-dirs: executable
+extra-source-files:
+- CHANGELOG.md
+- LICENSE.md
+- package.yaml
+- README.md
+- stack.yaml
+ghc-options: -Wall
+github: mgree/idioms
+library:
+  dependencies:
+  - base
+  - containers
+  - deepseq
+  source-dirs: library
+license: MIT
+maintainer: Michael Greenberg
+name: idioms
+synopsis: A new Haskeleton package.
+tests:
+  idioms-test-suite:
+    dependencies:
+    - base
+    - idioms
+    - containers
+    - QuickCheck
+    - tasty
+    - tasty-auto
+    - tasty-quickcheck
+    - tasty-hspec
+    ghc-options:
+    - -rtsopts
+    - -threaded
+    - -with-rtsopts=-N
+    main: Main.hs
+    source-dirs: test-suite
+version: '0.0.0'
