@@ -13,6 +13,7 @@ data Model a =
           threeGrams :: Map (a,a,a) Int }
   deriving (Eq, Ord, Show)
            
+-- TODO is this the right definition? could be misleading the benchmarks...
 instance NFData a => NFData (Model a) where
   rnf m = seq m $ seq (rnf $ twoGrams m) $ seq (rnf $ threeGrams m) ()
                        
@@ -29,15 +30,15 @@ countTwo two m = m { twoGrams = Map.insertWith (+) two 1 (twoGrams m) }
 countThree :: Ord a => (a,a,a) -> Model a -> Model a
 countThree three m = m { threeGrams = Map.insertWith (+) three 1 (threeGrams m) }
 
-grams :: Ord a => [a] -> Model a -> Model a
-grams []             m = m
-grams [_]            m = m -- only on symbol, leave it
-grams [a,b]          m = countTwo (a,b) m
-grams [a,b,c]        m = countThree (a,b,c) $ countTwo (b,c) $ m
-grams (a:b:c:d:rest) m = grams (c:d:rest) $ countThree (a,b,c) $ countTwo (b,c) $ m
-  
+-- | Train a model on a given input.
 trainOn :: Ord a => Model a -> [a] -> Model a
-trainOn m l@(a:b:_) = grams l $ countTwo (a,b) m
+trainOn model l@(a1:a2:_) = grams l $ countTwo (a1,a2) model
+  where grams :: Ord a => [a] -> Model a -> Model a
+        grams []             m = m
+        grams [_]            m = m -- only on symbol, leave it
+        grams [a,b]          m = countTwo (a,b) m
+        grams [a,b,c]        m = countThree (a,b,c) $ countTwo (b,c) $ m
+        grams (a:b:c:d:rest) m = grams (c:d:rest) $ countThree (a,b,c) $ countTwo (b,c) $ m
 trainOn m _ = m -- only one symbol, leave it
 
 -- TODO what are the smoothing tricks for novel symbols?
