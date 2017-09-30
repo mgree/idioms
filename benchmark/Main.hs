@@ -7,8 +7,12 @@ import Idioms.Grams
 main :: IO ()
 main = defaultMain 
        [bgroup "Books"
-        [ bench "train all" $ nfIO (train ["txts/ulysses.txt", "txts/mobydick.txt"])
-        , bench "ulysses"   $ nfIO (train ["txts/ulysses.txt"])
-        , bench "moby dick" $ nfIO (train ["txts/mobydick.txt"])
+        [ bench "train all (trainText)" $ nfIO (trainText ["txts/ulysses.txt", "txts/mobydick.txt"])
+        , bench "ulysses (trainText)"   $ nfIO (trainText ["txts/ulysses.txt"])
+        , bench "moby dick (trainText)" $ nfIO (trainText ["txts/mobydick.txt"])
+
+        , bench "train all (trainPar)" $ nfIO (trainPar ["txts/ulysses.txt", "txts/mobydick.txt"])
+        , bench "ulysses (trainPar)"   $ nfIO (trainPar ["txts/ulysses.txt"])
+        , bench "moby dick (trainPar)" $ nfIO (trainPar ["txts/mobydick.txt"])
         ]
        ]

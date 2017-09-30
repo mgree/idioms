@@ -40,6 +40,7 @@ library:
   - base
   - containers
   - deepseq
+  - parallel
   source-dirs: library
 license: MIT
 maintainer: Michael Greenberg

@@ -3,10 +3,13 @@
 module Idioms.Grams where
 
 import Control.DeepSeq
+import Control.Parallel.Strategies
 
 -- slightly faster, surprisingly, as of 2017-09-26 1:49am
 import Data.Map.Lazy (Map)
 import qualified Data.Map.Lazy as Map
+
+import Idioms.Munge
 
 data Model a = 
   Model { twoGrams :: Map (a,a) Int,
@@ -20,9 +23,12 @@ instance NFData a => NFData (Model a) where
 emptyModel :: Model a
 emptyModel = Model Map.empty Map.empty
 
+join :: (Ord k, Num a) => Map k a -> Map k a -> Map k a
+join = Map.unionWith (+)
+
 joinModels :: Ord a => [Model a] -> Model a
-joinModels ms = Model { twoGrams = Map.unions (map twoGrams ms),
-                        threeGrams = Map.unions (map threeGrams ms) }
+joinModels ms = Model { twoGrams = foldr join Map.empty (map twoGrams ms),
+                        threeGrams = foldr join Map.empty (map threeGrams ms) }
 
 countTwo :: Ord a => (a,a) -> Model a -> Model a
 countTwo two m = m { twoGrams = Map.insertWith (+) two 1 (twoGrams m) }
@@ -62,8 +68,24 @@ next m (a,b) = Map.map (\count -> fromIntegral count / fromIntegral ab) cs
 train :: [FilePath] -> IO (Model String)
 train fs = joinModels <$> mapM trainOnFile fs
   where trainOnFile f = do
-          text <- words <$> readFile f
-          return $ trainOn emptyModel text
+          txt <- words <$> readFile f
+          return $ trainOn emptyModel txt
+
+{- both these are slower -}
+trainText :: [FilePath] -> IO (Model String)
+trainText fs = joinModels <$> mapM (\f -> trainOn emptyModel <$> textFile f) fs
+
+trainText' :: [FilePath] -> IO (Model String)
+trainText' fs = do               
+  ss <- mapM readFile fs
+  let ms = map (trainOn emptyModel . text) ss
+  return $ joinModels ms
+
+trainPar :: [FilePath] -> IO (Model String)
+trainPar fs = do               
+  ss <- mapM readFile fs
+  let ms = parMap rdeepseq (trainOn emptyModel . text) ss
+  return $ joinModels ms
 
 books :: IO (Model String)
 books = train ["../literary_ebooks/mobydick.txt",
